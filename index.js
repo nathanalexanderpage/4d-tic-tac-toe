@@ -27,10 +27,25 @@ const takeMoveInput = () => {
     return coordinates;
 }
 
-
+let gameOngoing = true;
 
 printBoard();
-const coordinates = takeMoveInput();
-console.log("coordinates:", coordinates);
-makeMove(coordinates, 'x');
-printBoard();
+
+while(gameOngoing) {
+    const coordinates = takeMoveInput();
+    console.log("coordinates:", coordinates);
+    makeMove(coordinates, 'x');
+    printBoard();
+
+    const willTheGameEnd = !board.some((row) => {
+        return row.includes(null);
+    });
+
+    console.log(willTheGameEnd);
+
+    if (willTheGameEnd) {
+        gameOngoing = false;
+    }
+}
+
+console.log('Game is over!');
