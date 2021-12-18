@@ -26,16 +26,21 @@ const takeMoveInput = () => {
 
     return coordinates;
 }
-
+const player =[9,11];
 let gameOngoing = true;
+let roundCounter = 0;
 
 printBoard();
 
 while(gameOngoing) {
     const coordinates = takeMoveInput();
     console.log("coordinates:", coordinates);
-    makeMove(coordinates, 'x');
+    roundCounter % 2 != 0 ? makeMove(coordinates, player[0]) :  makeMove(coordinates, player[1]);
+
     printBoard();
+
+    roundCounter += 1;
+
 
     const willTheGameEnd = !board.some((row) => {
         return row.includes(null);
