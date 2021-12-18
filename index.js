@@ -35,7 +35,8 @@ printBoard();
 while(gameOngoing) {
     const coordinates = takeMoveInput();
     console.log("coordinates:", coordinates);
-    roundCounter % 2 != 0 ? makeMove(coordinates, player[0]) :  makeMove(coordinates, player[1]);
+    const thisRoundsPlayer = player[roundCounter % 2];
+    makeMove(coordinates,thisRoundsPlayer)
 
     printBoard();
 
