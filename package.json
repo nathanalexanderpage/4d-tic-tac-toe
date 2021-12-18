@@ -1,0 +1,19 @@
+{
+  "name": "4d-tic-tac-toe",
+  "version": "0.1.0",
+  "description": "tic-tac-toe. but 4D",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nathanalexanderpage/4d-tic-tac-toe.git"
+  },
+  "author": "Nathan Page & Sam Panek",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nathanalexanderpage/4d-tic-tac-toe/issues"
+  },
+  "homepage": "https://github.com/nathanalexanderpage/4d-tic-tac-toe#readme"
+}
