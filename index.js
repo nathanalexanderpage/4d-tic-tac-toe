@@ -1,5 +1,33 @@
 const readlineSync = require('readline-sync');
 
+console.log("marco")
+const dimensions = 3
+
+const optionsOfDirection = ['=','+',"-"]
+let allDirections = []
+
+function recursiveDirections(directionString = ''){
+    console.log('start')
+    if (directionString.length === dimensions){
+
+        allDirections.push(directionString)
+        return 
+    }
+
+    else{
+        for(direction in optionsOfDirection){
+            const newDirectionString = directionString + optionsOfDirection[direction]
+            recursiveDirections(newDirectionString)
+        }
+    }
+
+}
+recursiveDirections()
+
+const withoutNoGo = allDirections.slice(1)
+
+
+
 const board = [
     [null, null, null],
     [null, null, null],
@@ -114,6 +142,22 @@ while(gameOngoing) {
 
 console.log('Game is over!');
 
+
+
+
+
+
 evaluateWinCondition(coordinates){
-    for 
+
+    // iterate through directional vectors
+        // increment current direction
+        // '+=-'
+        // note cell contents if cell within board && cell contains current turn's player value
+        // const resultsOfDirection = [true];
+        // check opposite directional vector
+        // '-=-'
+        // const resultsOfOppositeDirection =[];
+
+
+
 }
