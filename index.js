@@ -7,7 +7,7 @@ const optionsOfDirection = ['=','+',"-"]
 let allDirections = []
 
 function recursiveDirections(directionString = ''){
-    console.log('start')
+
     if (directionString.length === dimensions){
 
         allDirections.push(directionString)
