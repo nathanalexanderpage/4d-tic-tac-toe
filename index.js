@@ -30,7 +30,7 @@ function getAllPossibleMovementDirections(dimensions) {
 }
 
 function generateGameBoard(dimensions){
-    const totalNumberOfBoardCells= 3 ** dimensions;
+    const totalNumberOfBoardCells = LENGTH_OF_BOARD ** dimensions;
 
     const gameBoard = new Array(totalNumberOfBoardCells);
 
