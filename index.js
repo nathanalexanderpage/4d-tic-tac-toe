@@ -1,6 +1,12 @@
 const readlineSync = require('readline-sync');
 
-const gameDimensions = 3;
+const GAME_DIMENSIONS = parseInt(readlineSync.question('How many dimensions are we playing tic-tac-toe in today? '));
+const LENGTH_OF_BOARD = 3;
+
+if (GAME_DIMENSIONS > 10) {
+    console.log('not today, copper!');
+    process.exit();
+}
 
 function getAllPossibleMovementDirections(dimensions) {
     const optionsOfDirection = ['=','+',"-"];
@@ -23,28 +29,40 @@ function getAllPossibleMovementDirections(dimensions) {
     return allDirectionPermutations.slice(1);
 }
 
-const allPossibleMovementDirections = getAllPossibleMovementDirections(gameDimensions);
-console.log(allPossibleMovementDirections);
+function generateGameBoard(dimensions){
+    const totalNumberOfBoardCells= 3 ** dimensions;
 
-const printBoard = () => {
-    console.log('Print board here');
+    const gameBoard = new Array(totalNumberOfBoardCells);
+
+    return gameBoard;
 }
 
-const makeMove = (coordinate, value) => {
-    board[coordinate.x][coordinate.y] = value;
+const allPossibleMovementDirections = getAllPossibleMovementDirections(GAME_DIMENSIONS);
+console.log(allPossibleMovementDirections);
+const gameBoard = generateGameBoard(GAME_DIMENSIONS)
+console.log(gameBoard.length)
+
+const printBoard = () => {
+    console.log(gameBoard);
+}
+
+const makeMove = (coordinates, value) => {
+    let gameBoardIndex= 0;
+
+    while (coordinates.length > 0){
+        const dimension = coordinates.length;
+        const dimensionCoordinate = coordinates.pop();
+        let gameBoardIndexAddend = (LENGTH_OF_BOARD ** (dimension - 1)) * dimensionCoordinate;
+        gameBoardIndex += gameBoardIndexAddend;
+    }
+
+    gameBoard[gameBoardIndex] = value;
 }
 
 const takeMoveInput = () => {
-    const coordinates = {};
-    
     const coordinateInput = readlineSync.question('May I have your move, sir? ');
-    
-    // TODO: make dynamic per dimension
-    coordinates.x = parseInt(coordinateInput.split(',')[0]);
-    coordinates.y = parseInt(coordinateInput.split(',')[1]);
-    
+    const coordinates = coordinateInput.split(',').map(coordinate => parseInt(coordinate));
     console.log(`You chose: ${coordinateInput}!`);
-    
     return coordinates;
 }
 
@@ -64,16 +82,15 @@ while(gameOngoing) {
     
     roundCounter += 1;
     
+    // const willTheGameEnd = !board.some((row) => {
+    //     return row.includes(null);
+    // });
     
-    const willTheGameEnd = !board.some((row) => {
-        return row.includes(null);
-    });
+    // console.log(willTheGameEnd);
     
-    console.log(willTheGameEnd);
-    
-    if (willTheGameEnd) {
-        gameOngoing = false;
-    }
+    // if (willTheGameEnd) {
+    //     gameOngoing = false;
+    // }
 }
 
 console.log('Game is over!');
