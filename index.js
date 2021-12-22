@@ -1,6 +1,6 @@
-const readlineSync = require('readline-sync');
+import { question } from 'readline-sync';
 
-const GAME_DIMENSIONS = parseInt(readlineSync.question('How many dimensions are we playing tic-tac-toe in today? '));
+const GAME_DIMENSIONS = parseInt(question('How many dimensions are we playing tic-tac-toe in today? '));
 const LENGTH_OF_BOARD = 3;
 
 if (GAME_DIMENSIONS > 10) {
@@ -60,7 +60,7 @@ const makeMove = (coordinates, value) => {
 }
 
 const takeMoveInput = () => {
-    const coordinateInput = readlineSync.question('May I have your move, sir? ');
+    const coordinateInput = question('May I have your move, sir? ');
     const coordinates = coordinateInput.split(',').map(coordinate => parseInt(coordinate));
     console.log(`You chose: ${coordinateInput}!`);
     return coordinates;
