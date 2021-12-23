@@ -106,12 +106,12 @@ console.log('Game is over!');
 
 function evaluateWinCondition(coordinates) {
     for (directionIndex in allPossibleMovementDirections) {
-        const coordinatesAddends = [];
+        const coordinatesToCheck = [];
 
         for(let i = 0; i < GAME_DIMENSIONS - 1; i++) {
             const indivdualDirection = MOVEMENT_PER_PLANE[allPossibleMovementDirections[directionIndex][i]];
             const newCoordinate = coordinates[i] + indivdualDirection;
-            coordinatesAddends.push(newCoordinate);
+            coordinatesToCheck.push(newCoordinate);
         }        
     }
     
