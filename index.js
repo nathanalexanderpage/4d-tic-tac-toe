@@ -2,9 +2,9 @@
 // for in does not work the same way it does in python
 // The following example show this:
 
-// const array = ['marco','polo','travler']
-// for( thing in array){
-//     console.log(thing)
+// const array = ['marco','polo','travler'];
+// for ( thing in array) {
+//     console.log(thing);
 // }
 
 const readlineSync = require('readline-sync');
@@ -21,14 +21,14 @@ function getAllPossibleMovementDirections(dimensions) {
     const optionsOfDirection = Object.keys(MOVEMENT_PER_PLANE);
     let allDirectionPermutations = [];
     
-    function createDirectionPermutations(directionString = ''){
-        if (directionString.length === dimensions){
-            allDirectionPermutations.push(directionString)
-            return 
+    function createDirectionPermutations(directionString = '') {
+        if (directionString.length === dimensions) {
+            allDirectionPermutations.push(directionString);
+            return ;
         } else {
-            for(directionIndex in optionsOfDirection){
-                const newDirectionString = directionString + optionsOfDirection[directionIndex]
-                createDirectionPermutations(newDirectionString)
+            for (directionIndex in optionsOfDirection) {
+                const newDirectionString = directionString + optionsOfDirection[directionIndex];
+                createDirectionPermutations(newDirectionString);
             }
         }
     }
@@ -38,7 +38,7 @@ function getAllPossibleMovementDirections(dimensions) {
     return allDirectionPermutations.slice(1);
 }
 
-function generateGameBoard(dimensions){
+function generateGameBoard(dimensions) {
     const totalNumberOfBoardCells = LENGTH_OF_BOARD ** dimensions;
 
     const gameBoard = new Array(totalNumberOfBoardCells);
@@ -48,24 +48,28 @@ function generateGameBoard(dimensions){
 
 const allPossibleMovementDirections = getAllPossibleMovementDirections(GAME_DIMENSIONS);
 console.log(allPossibleMovementDirections);
-const gameBoard = generateGameBoard(GAME_DIMENSIONS)
-console.log(gameBoard.length)
+const gameBoard = generateGameBoard(GAME_DIMENSIONS);
+console.log(gameBoard.length);
 
 const printBoard = () => {
     console.log(gameBoard);
 }
 
-const makeMove = (coordinates, value) => {
-    let gameBoardIndex= 0;
+const getGameBoardIndex = (coordinates) => {
+    let gameBoardIndex = 0;
 
-    while (coordinates.length > 0){
+    while (coordinates.length > 0) {
         const dimension = coordinates.length;
         const dimensionCoordinate = coordinates.pop();
         let gameBoardIndexAddend = (LENGTH_OF_BOARD ** (dimension - 1)) * dimensionCoordinate;
         gameBoardIndex += gameBoardIndexAddend;
     }
 
-    gameBoard[gameBoardIndex] = value;
+    return gameBoardIndex;
+}
+
+const makeMove = (coordinates, value) => {
+    gameBoard[getGameBoardIndex(coordinates)] = value;
 }
 
 const takeMoveInput = () => {
@@ -75,47 +79,73 @@ const takeMoveInput = () => {
     return coordinates;
 }
 
+const getThisRoundsPlayer = () => {
+    const thisRoundsPlayer = player[roundCounter % 2];
+    return thisRoundsPlayer;
+}
+
 const player = ['X','O'];
 let gameOngoing = true;
 let roundCounter = 0;
 
 printBoard();
 
-while(gameOngoing) {
-    const coordinates = takeMoveInput();
-    console.log("coordinates:", coordinates);
-    const thisRoundsPlayer = player[roundCounter % 2];
-    makeMove(coordinates, thisRoundsPlayer);
-    
-    printBoard();
-    
-    roundCounter += 1;
-    
-    // const willTheGameEnd = !board.some((row) => {
-    //     return row.includes(null);
-    // });
-    
-    // console.log(willTheGameEnd);
-    
-    // if (willTheGameEnd) {
-    //     gameOngoing = false;
-    // }
+
+const isGameBoardFull = () =>{
+    return roundCounter === gameBoard.length;
 }
 
-console.log('Game is over!');
+const incrementCoordinatesInDirection = (directionIndex,coordinates,isOpposite) => {
+    const coordinatesToCheck = [];
+    for (let i = 0; i < GAME_DIMENSIONS - 1; i++) {
+        const indivdualDirection = MOVEMENT_PER_PLANE[allPossibleMovementDirections[directionIndex][i]];
+        const newCoordinate = isOpposite ? coordinates[i] - indivdualDirection : coordinates[i] + indivdualDirection;
+        coordinatesToCheck.push(newCoordinate);
+    }
+    return coordinatesToCheck;
+}
 
-function evaluateWinCondition(coordinates) {
+const evaluateWinCondition = (coordinates) => {
     for (directionIndex in allPossibleMovementDirections) {
-        const coordinatesToCheck = [];
+        
+        let playersValueInARow = 0;
 
-        for(let i = 0; i < GAME_DIMENSIONS - 1; i++) {
-            const indivdualDirection = MOVEMENT_PER_PLANE[allPossibleMovementDirections[directionIndex][i]];
-            const newCoordinate = coordinates[i] + indivdualDirection;
-            coordinatesToCheck.push(newCoordinate);
-        }        
+        let continueIncrementing = true;
+        let coordinatesToCheck = coordinates;
+
+        while (continueIncrementing) {
+            coordinatesToCheck = incrementCoordinatesInDirection(directionIndex,coordinatesToCheck,false);
+            
+            if(gameBoard[getGameBoardIndex(coordinatesToCheck)] !== getThisRoundsPlayer()) {
+                continueIncrementing = false;
+            } else {
+                playersValueInARow += 1;
+            }
+        }
+        
+        continueIncrementing = true;
+        coordinatesToCheck = coordinates;
+
+        while (continueIncrementing) {
+            coordinatesToCheck = incrementCoordinatesInDirection(directionIndex,coordinatesToCheck,true);
+            
+            if(gameBoard[getGameBoardIndex(coordinatesToCheck)] !== getThisRoundsPlayer()) {
+                continueIncrementing = false;
+            } else {
+                playersValueInARow += 1;
+            }
+        }
+
+        console.log(playersValueInARow);
+
+        if (playersValueInARow ===LENGTH_OF_BOARD - 1) {
+            return true;
+        }
+        
     }
     
-    return;
+    return false;
+    
     
     // iterate through directional vectors
     // check if that direction has been applied
@@ -136,6 +166,41 @@ function evaluateWinCondition(coordinates) {
     //
     // const resultsOfOppositeDirection =[];
 }
+
+while (gameOngoing) {
+    roundCounter += 1;
+    const coordinates = takeMoveInput();
+    console.log("coordinates:", coordinates);
+    const thisRoundsPlayer = getThisRoundsPlayer();
+    makeMove(coordinates, thisRoundsPlayer);
+    
+    printBoard();
+    const testEvaluateWin = evaluateWinCondition(coordinates);
+
+    if (testEvaluateWin) {
+        console.log("wins");
+        gameOngoing = false;
+    }
+
+    const testBoardFull = isGameBoardFull();
+    if (testBoardFull) {
+        console.log("draws");
+        gameOngoing = false;
+    }
+    
+    
+    // const willTheGameEnd = !board.some((row) => {
+    //     return row.includes(null);
+    // });
+    
+    // console.log(willTheGameEnd);
+    
+    // if (willTheGameEnd) {
+    //     gameOngoing = false;
+    // }
+}
+    
+console.log('Game is over!');
 
 const board = [
     [null, null, null],
