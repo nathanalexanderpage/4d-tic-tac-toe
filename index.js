@@ -74,9 +74,47 @@ const makeMove = (coordinates, value) => {
 }
 
 const takeMoveInput = () => {
-    const coordinateInput = readlineSync.question('May I have your move, sir? ');
-    const coordinates = coordinateInput.split(',').map(coordinate => parseInt(coordinate));
-    console.log(`You chose: ${coordinateInput}!`);
+    let coordinateInput;
+    let isValidCoordinateInput;
+    const validCoordinateCriteria = new RegExp(/^\d+([,]\d+)+$/);
+    let coordinates;
+    let isValidSetOfCoordinates;
+    let isValidGameBoardLocation;
+
+    while (!isValidCoordinateInput || !isValidNumberOfCoordinates || !isValidSetOfCoordinates || !isValidGameBoardLocation) {
+        isValidCoordinateInput = false;
+        isValidNumberOfCoordinates = false;
+        isValidSetOfCoordinates = false;
+        isValidGameBoardLocation = false;
+        coordinateInput = readlineSync.question('May I have your move, sir? ');
+    
+        isValidCoordinateInput = validCoordinateCriteria.test(coordinateInput);
+
+        if (isValidCoordinateInput) {
+            coordinates = coordinateInput.split(',').map(coordinate => parseInt(coordinate));
+
+            isValidNumberOfCoordinates = coordinates.length === GAME_DIMENSIONS;
+
+            let areAllCoordinatesValid = true;
+
+            for (coordinateIndex in coordinates) {
+                if (coordinates[coordinateIndex] < 0 || coordinates[coordinateIndex] > LENGTH_OF_BOARD - 1) {
+                    areAllCoordinatesValid = false;
+                }
+            }
+
+            isValidSetOfCoordinates = areAllCoordinatesValid;
+
+            if (isValidSetOfCoordinates) {
+                if (gameBoard[getGameBoardIndex(coordinates)] === undefined) {
+                    isValidGameBoardLocation = true;
+                }
+            }
+        }
+    }    
+
+    console.log(`Team ${getThisRoundsPlayer()} chose: (${coordinateInput})`);
+
     return coordinates;
 }
 
@@ -139,7 +177,7 @@ const evaluateWinCondition = (coordinates) => {
             }
         }
 
-        console.log(playersValueInARow);
+        // console.log('playersValueInARow:', playersValueInARow);
 
         if (playersValueInARow ===LENGTH_OF_BOARD - 1) {
             return true;
@@ -173,35 +211,22 @@ const evaluateWinCondition = (coordinates) => {
 while (gameOngoing) {
     roundCounter += 1;
     const coordinates = takeMoveInput();
-    console.log("coordinates game loop:", coordinates);
     const thisRoundsPlayer = getThisRoundsPlayer();
     makeMove(coordinates, thisRoundsPlayer);
     
     printBoard();
-    console.log("coordinates before evalWin:", coordinates);
-    const testEvaluateWin = evaluateWinCondition(coordinates);
+    const isVictoryPresent = evaluateWinCondition(coordinates);
 
-    if (testEvaluateWin) {
-        console.log("wins");
+    if (isVictoryPresent) {
+        console.log(`Team ${getThisRoundsPlayer()} wins!`);
         gameOngoing = false;
     }
 
-    const testBoardFull = isGameBoardFull();
-    if (testBoardFull) {
-        console.log("draws");
+    const isDrawPresent = isGameBoardFull();
+    if (!isVictoryPresent && isDrawPresent) {
+        console.log('The cat wins!');
         gameOngoing = false;
     }
-    
-    
-    // const willTheGameEnd = !board.some((row) => {
-    //     return row.includes(null);
-    // });
-    
-    // console.log(willTheGameEnd);
-    
-    // if (willTheGameEnd) {
-    //     gameOngoing = false;
-    // }
 }
     
 console.log('Game is over!');
