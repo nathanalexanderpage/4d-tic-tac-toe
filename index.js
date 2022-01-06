@@ -57,10 +57,11 @@ const printBoard = () => {
 
 const getGameBoardIndex = (coordinates) => {
     let gameBoardIndex = 0;
+    let coordinatesToPop = [...coordinates];
 
-    while (coordinates.length > 0) {
-        const dimension = coordinates.length;
-        const dimensionCoordinate = coordinates.pop();
+    while (coordinatesToPop.length > 0) {
+        const dimension = coordinatesToPop.length;
+        const dimensionCoordinate = coordinatesToPop.pop();
         let gameBoardIndexAddend = (LENGTH_OF_BOARD ** (dimension - 1)) * dimensionCoordinate;
         gameBoardIndex += gameBoardIndexAddend;
     }
@@ -95,13 +96,15 @@ const isGameBoardFull = () =>{
     return roundCounter === gameBoard.length;
 }
 
-const incrementCoordinatesInDirection = (directionIndex,coordinates,isOpposite) => {
+const incrementCoordinatesInDirection = (directionIndex, coordinates, isOpposite) => {
     const coordinatesToCheck = [];
-    for (let i = 0; i < GAME_DIMENSIONS - 1; i++) {
+
+    for (let i = 0; i < GAME_DIMENSIONS; i++) {
         const indivdualDirection = MOVEMENT_PER_PLANE[allPossibleMovementDirections[directionIndex][i]];
         const newCoordinate = isOpposite ? coordinates[i] - indivdualDirection : coordinates[i] + indivdualDirection;
         coordinatesToCheck.push(newCoordinate);
     }
+
     return coordinatesToCheck;
 }
 
@@ -111,11 +114,11 @@ const evaluateWinCondition = (coordinates) => {
         let playersValueInARow = 0;
 
         let continueIncrementing = true;
-        let coordinatesToCheck = coordinates;
+        let coordinatesToCheck = [...coordinates];
 
         while (continueIncrementing) {
             coordinatesToCheck = incrementCoordinatesInDirection(directionIndex,coordinatesToCheck,false);
-            
+
             if(gameBoard[getGameBoardIndex(coordinatesToCheck)] !== getThisRoundsPlayer()) {
                 continueIncrementing = false;
             } else {
@@ -124,7 +127,7 @@ const evaluateWinCondition = (coordinates) => {
         }
         
         continueIncrementing = true;
-        coordinatesToCheck = coordinates;
+        coordinatesToCheck = [...coordinates];
 
         while (continueIncrementing) {
             coordinatesToCheck = incrementCoordinatesInDirection(directionIndex,coordinatesToCheck,true);
@@ -170,11 +173,12 @@ const evaluateWinCondition = (coordinates) => {
 while (gameOngoing) {
     roundCounter += 1;
     const coordinates = takeMoveInput();
-    console.log("coordinates:", coordinates);
+    console.log("coordinates game loop:", coordinates);
     const thisRoundsPlayer = getThisRoundsPlayer();
     makeMove(coordinates, thisRoundsPlayer);
     
     printBoard();
+    console.log("coordinates before evalWin:", coordinates);
     const testEvaluateWin = evaluateWinCondition(coordinates);
 
     if (testEvaluateWin) {
