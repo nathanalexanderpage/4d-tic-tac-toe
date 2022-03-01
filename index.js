@@ -66,6 +66,10 @@ const getGameBoardIndex = (coordinates) => {
         gameBoardIndex += gameBoardIndexAddend;
     }
 
+    if (gameBoardIndex < 0 || gameBoardIndex > LENGTH_OF_BOARD ** GAME_DIMENSIONS) {
+        throw new Error(`Attempting to check a location (${gameBoardIndex}) outside of the game board (${LENGTH_OF_BOARD ** GAME_DIMENSIONS - 1})!`);
+    }
+
     return gameBoardIndex;
 }
 
@@ -88,6 +92,7 @@ const takeMoveInput = () => {
         isValidGameBoardLocation = false;
         coordinateInput = readlineSync.question('May I have your move, sir? ');
     
+        // tests whether player's input is valid form of coordinate entry -- (x,y,z)
         isValidCoordinateInput = validCoordinateCriteria.test(coordinateInput);
 
         if (isValidCoordinateInput) {
@@ -140,6 +145,12 @@ const incrementCoordinatesInDirection = (directionIndex, coordinates, isOpposite
     for (let i = 0; i < GAME_DIMENSIONS; i++) {
         const indivdualDirection = MOVEMENT_PER_PLANE[allPossibleMovementDirections[directionIndex][i]];
         const newCoordinate = isOpposite ? coordinates[i] - indivdualDirection : coordinates[i] + indivdualDirection;
+
+        // return early if singular coordinate is less than zero or greater than board length.
+        if (newCoordinate < 0 || newCoordinate > LENGTH_OF_BOARD - 1) {
+            return null;
+        }
+
         coordinatesToCheck.push(newCoordinate);
     }
 
@@ -155,9 +166,10 @@ const evaluateWinCondition = (coordinates) => {
         let coordinatesToCheck = [...coordinates];
 
         while (continueIncrementing) {
-            coordinatesToCheck = incrementCoordinatesInDirection(directionIndex,coordinatesToCheck,false);
+            coordinatesToCheck = incrementCoordinatesInDirection(directionIndex, coordinatesToCheck, false);
 
-            if(gameBoard[getGameBoardIndex(coordinatesToCheck)] !== getThisRoundsPlayer()) {
+            // only check game board index if coordinatesToCheck is a set of coordinates inside the board
+            if(!coordinatesToCheck || gameBoard[getGameBoardIndex(coordinatesToCheck)] !== getThisRoundsPlayer()) {
                 continueIncrementing = false;
             } else {
                 playersValueInARow += 1;
@@ -168,9 +180,9 @@ const evaluateWinCondition = (coordinates) => {
         coordinatesToCheck = [...coordinates];
 
         while (continueIncrementing) {
-            coordinatesToCheck = incrementCoordinatesInDirection(directionIndex,coordinatesToCheck,true);
+            coordinatesToCheck = incrementCoordinatesInDirection(directionIndex, coordinatesToCheck, true);
             
-            if(gameBoard[getGameBoardIndex(coordinatesToCheck)] !== getThisRoundsPlayer()) {
+            if(!coordinatesToCheck || gameBoard[getGameBoardIndex(coordinatesToCheck)] !== getThisRoundsPlayer()) {
                 continueIncrementing = false;
             } else {
                 playersValueInARow += 1;
@@ -179,7 +191,7 @@ const evaluateWinCondition = (coordinates) => {
 
         // console.log('playersValueInARow:', playersValueInARow);
 
-        if (playersValueInARow ===LENGTH_OF_BOARD - 1) {
+        if (playersValueInARow === LENGTH_OF_BOARD - 1) {
             return true;
         }
         
