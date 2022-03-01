@@ -8,14 +8,21 @@
 // }
 
 const readlineSync = require('readline-sync');
-const GAME_DIMENSIONS = parseInt(readlineSync.question('How many dimensions are we playing tic-tac-toe in today? '));
+
+function validateDimensions(){
+    let gameDimensions;
+    while (true){
+        gameDimensions= parseInt(readlineSync.question('How many dimensions are we playing tic-tac-toe in today? '));
+        if (gameDimensions < 10) {
+            break;
+        }
+    }
+    return gameDimensions;
+}
+const GAME_DIMENSIONS = validateDimensions()
 const LENGTH_OF_BOARD = 3;
 const MOVEMENT_PER_PLANE = {'=': 0, '+': 1, '-': -1};
 
-if (GAME_DIMENSIONS > 10) {
-    console.log('not today, copper!');
-    process.exit();
-}
 
 function getAllPossibleMovementDirections(dimensions) {
     const optionsOfDirection = Object.keys(MOVEMENT_PER_PLANE);
@@ -24,7 +31,7 @@ function getAllPossibleMovementDirections(dimensions) {
     function createDirectionPermutations(directionString = '') {
         if (directionString.length === dimensions) {
             allDirectionPermutations.push(directionString);
-            return ;
+            return;
         } else {
             for (directionIndex in optionsOfDirection) {
                 const newDirectionString = directionString + optionsOfDirection[directionIndex];
